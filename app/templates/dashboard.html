@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>SOC Incident Dashboard</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background: #0b1220;
+
+            color: #e5e7eb;
+        }
+
+
+        /* ==================================================
+           HEADER
+           ================================================== */
+
+        .header {
+
+            background: #111827;
+
+            border-bottom:
+                1px solid #263244;
+
+            padding: 22px 35px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+        }
+
+
+        .header h1 {
+
+            margin: 0;
+
+            font-size: 24px;
+
+            color: #ffffff;
+        }
+
+
+        .header p {
+
+            margin: 6px 0 0;
+
+            color: #94a3b8;
+
+            font-size: 13px;
+        }
+
+
+        .home-button {
+
+            text-decoration: none;
+
+            background: #2563eb;
+
+            color: white;
+
+            padding: 10px 18px;
+
+            border-radius: 6px;
+
+            font-size: 13px;
+
+            font-weight: bold;
+        }
+
+
+        .home-button:hover {
+
+            background: #1d4ed8;
+        }
+
+
+        /* ==================================================
+           MAIN CONTAINER
+           ================================================== */
+
+        .container {
+
+            padding: 30px 35px;
+
+            max-width: 1600px;
+
+            margin: auto;
+        }
+
+
+        /* ==================================================
+           STATISTICS
+           ================================================== */
+
+        .stats {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 20px;
+
+            margin-bottom: 30px;
+        }
+
+
+        .stat-card {
+
+            background: #111827;
+
+            border:
+                1px solid #263244;
+
+            border-radius: 10px;
+
+            padding: 22px;
+
+            min-height: 120px;
+        }
+
+
+        .stat-title {
+
+            color: #94a3b8;
+
+            font-size: 13px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.5px;
+        }
+
+
+        .stat-value {
+
+            margin-top: 12px;
+
+            font-size: 32px;
+
+            font-weight: bold;
+
+            color: #ffffff;
+        }
+
+
+        /* ==================================================
+           SECTION HEADER
+           ================================================== */
+
+        .section-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 15px;
+        }
+
+
+        .section-header h2 {
+
+            margin: 0;
+
+            font-size: 19px;
+
+            color: #ffffff;
+        }
+
+
+        .section-header span {
+
+            color: #64748b;
+
+            font-size: 13px;
+        }
+
+
+        /* ==================================================
+           TABLE
+           ================================================== */
+
+        .table-container {
+
+            background: #111827;
+
+            border:
+                1px solid #263244;
+
+            border-radius: 10px;
+
+            overflow-x: auto;
+        }
+
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 1200px;
+        }
+
+
+        th {
+
+            background: #172033;
+
+            color: #94a3b8;
+
+            text-align: left;
+
+            font-size: 12px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.5px;
+
+            padding: 14px;
+
+            border-bottom:
+                1px solid #263244;
+        }
+
+
+        td {
+
+            padding: 14px;
+
+            border-bottom:
+                1px solid #1f2937;
+
+            font-size: 13px;
+
+            color: #d1d5db;
+
+            vertical-align: middle;
+        }
+
+
+        tr:last-child td {
+
+            border-bottom: none;
+        }
+
+
+        tr:hover {
+
+            background: #151e2e;
+        }
+
+
+        .filename {
+
+            color: #ffffff;
+
+            font-weight: 600;
+
+            max-width: 240px;
+
+            word-break: break-word;
+        }
+
+
+        .sender {
+
+            max-width: 220px;
+
+            word-break: break-word;
+
+            color: #cbd5e1;
+        }
+
+
+        .subject {
+
+            max-width: 260px;
+
+            word-break: break-word;
+        }
+
+
+        /* ==================================================
+           BADGES
+           ================================================== */
+
+        .badge {
+
+            display: inline-block;
+
+            padding: 5px 9px;
+
+            border-radius: 5px;
+
+            font-size: 11px;
+
+            font-weight: bold;
+
+            text-transform: uppercase;
+        }
+
+
+        .badge-malicious {
+
+            background: #7f1d1d;
+
+            color: #fecaca;
+        }
+
+
+        .badge-suspicious {
+
+            background: #78350f;
+
+            color: #fde68a;
+        }
+
+
+        .badge-benign {
+
+            background: #14532d;
+
+            color: #bbf7d0;
+        }
+
+
+        .badge-high {
+
+            background: #7f1d1d;
+
+            color: #fecaca;
+        }
+
+
+        .badge-medium {
+
+            background: #78350f;
+
+            color: #fde68a;
+        }
+
+
+        .badge-low {
+
+            background: #1e3a8a;
+
+            color: #bfdbfe;
+        }
+
+
+        .badge-minimal {
+
+            background: #334155;
+
+            color: #cbd5e1;
+        }
+
+
+        /* ==================================================
+           SCORE
+           ================================================== */
+
+        .score {
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            color: #ffffff;
+        }
+
+
+        .score-label {
+
+            color: #64748b;
+
+            font-size: 11px;
+        }
+
+
+        /* ==================================================
+           INVESTIGATE BUTTON
+           ================================================== */
+
+        .investigate-button {
+
+            display: inline-block;
+
+            text-decoration: none;
+
+            background: #2563eb;
+
+            color: #ffffff;
+
+            padding: 8px 13px;
+
+            border-radius: 5px;
+
+            font-size: 12px;
+
+            font-weight: bold;
+
+            white-space: nowrap;
+        }
+
+
+        .investigate-button:hover {
+
+            background: #1d4ed8;
+        }
+
+
+        /* ==================================================
+           EMPTY STATE
+           ================================================== */
+
+        .empty {
+
+            text-align: center;
+
+            padding: 60px 20px;
+
+            color: #64748b;
+        }
+
+
+        .empty-title {
+
+            font-size: 18px;
+
+            color: #cbd5e1;
+
+            margin-bottom: 8px;
+        }
+
+
+        /* ==================================================
+           RESPONSIVE
+           ================================================== */
+
+        @media (max-width: 900px) {
+
+            .stats {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+
+            .header {
+
+                padding: 20px;
+            }
+
+
+            .container {
+
+                padding: 20px;
+            }
+        }
+
+
+        @media (max-width: 600px) {
+
+            .stats {
+
+                grid-template-columns: 1fr;
+            }
+
+
+            .header {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 15px;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ======================================================
+     HEADER
+     ====================================================== -->
+
+<header class="header">
+
+    <div>
+
+        <h1>
+            Security Operations Center
+        </h1>
+
+        <p>
+            Automated Threat Detection &amp;
+            Phishing Triage
+        </p>
+
+    </div>
+
+
+    <a
+        href="/"
+        class="home-button"
+    >
+        Analyze New Email
+    </a>
+
+</header>
+
+
+<!-- ======================================================
+     MAIN
+     ====================================================== -->
+
+<main class="container">
+
+
+    <!-- ==================================================
+         STATISTICS
+         ================================================== -->
+
+    <section class="stats">
+
+
+        <div class="stat-card">
+
+            <div class="stat-title">
+                Total Incidents
+            </div>
+
+            <div class="stat-value">
+                {{ statistics.total }}
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-title">
+                Malicious
+            </div>
+
+            <div class="stat-value">
+                {{ statistics.malicious }}
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-title">
+                Suspicious
+            </div>
+
+            <div class="stat-value">
+                {{ statistics.suspicious }}
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-title">
+                Benign
+            </div>
+
+            <div class="stat-value">
+                {{ statistics.benign }}
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+    <!-- ==================================================
+         INCIDENT LIST
+         ================================================== -->
+
+    <section>
+
+
+        <div class="section-header">
+
+            <h2>
+                Incident Queue
+            </h2>
+
+            <span>
+                {{ incidents|length }} incident(s)
+            </span>
+
+        </div>
+
+
+        <div class="table-container">
+
+
+            {% if incidents %}
+
+
+            <table>
+
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            ID
+                        </th>
+
+                        <th>
+                            Filename
+                        </th>
+
+                        <th>
+                            Sender
+                        </th>
+
+                        <th>
+                            Subject
+                        </th>
+
+                        <th>
+                            Risk Score
+                        </th>
+
+                        <th>
+                            Verdict
+                        </th>
+
+                        <th>
+                            Risk Level
+                        </th>
+
+                        <th>
+                            Priority
+                        </th>
+
+                        <th>
+                            Confidence
+                        </th>
+
+                        <th>
+                            Analysis Time
+                        </th>
+
+                        <th>
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+
+                {% for incident in incidents %}
+
+
+                    <tr>
+
+
+                        <!-- ID -->
+
+                        <td>
+
+                            #{{ incident.id }}
+
+                        </td>
+
+
+                        <!-- FILENAME -->
+
+                        <td class="filename">
+
+                            {{ incident.filename }}
+
+                        </td>
+
+
+                        <!-- SENDER -->
+
+                        <td class="sender">
+
+                            {{ incident.sender or "Not available" }}
+
+                        </td>
+
+
+                        <!-- SUBJECT -->
+
+                        <td class="subject">
+
+                            {{ incident.subject or "No subject" }}
+
+                        </td>
+
+
+                        <!-- SCORE -->
+
+                        <td>
+
+                            <span class="score">
+
+                                {{ incident.risk_score }}
+
+                            </span>
+
+                            <span class="score-label">
+                                /100
+                            </span>
+
+                        </td>
+
+
+                        <!-- VERDICT -->
+
+                        <td>
+
+
+                            {% if incident.verdict == "MALICIOUS" %}
+
+                                <span class="badge badge-malicious">
+                                    MALICIOUS
+                                </span>
+
+
+                            {% elif incident.verdict == "SUSPICIOUS" %}
+
+                                <span class="badge badge-suspicious">
+                                    SUSPICIOUS
+                                </span>
+
+
+                            {% else %}
+
+                                <span class="badge badge-benign">
+                                    BENIGN
+                                </span>
+
+                            {% endif %}
+
+
+                        </td>
+
+
+                        <!-- RISK LEVEL -->
+
+                        <td>
+
+
+                            {% if incident.risk_level == "HIGH" %}
+
+                                <span class="badge badge-high">
+                                    HIGH
+                                </span>
+
+
+                            {% elif incident.risk_level == "MEDIUM" %}
+
+                                <span class="badge badge-medium">
+                                    MEDIUM
+                                </span>
+
+
+                            {% elif incident.risk_level == "LOW" %}
+
+                                <span class="badge badge-low">
+                                    LOW
+                                </span>
+
+
+                            {% else %}
+
+                                <span class="badge badge-minimal">
+                                    MINIMAL
+                                </span>
+
+                            {% endif %}
+
+
+                        </td>
+
+
+                        <!-- PRIORITY -->
+
+                        <td>
+
+                            {{ incident.priority }}
+
+                        </td>
+
+
+                        <!-- CONFIDENCE -->
+
+                        <td>
+
+                            {{ incident.confidence }}
+
+                        </td>
+
+
+                        <!-- ANALYSIS TIME -->
+
+                        <td>
+
+                            {{ incident.analysis_time }}
+
+                        </td>
+
+
+                        <!-- INVESTIGATION -->
+
+                        <td>
+
+                            <a
+                                href="/incident/{{ incident.id }}"
+                                class="investigate-button"
+                            >
+                                Investigate
+                            </a>
+
+                        </td>
+
+
+                    </tr>
+
+
+                {% endfor %}
+
+
+                </tbody>
+
+
+            </table>
+
+
+            {% else %}
+
+
+            <div class="empty">
+
+                <div class="empty-title">
+                    No incidents found
+                </div>
+
+                <div>
+                    Upload an .eml file to create
+                    the first security incident.
+                </div>
+
+            </div>
+
+
+            {% endif %}
+
+
+        </div>
+
+
+    </section>
+
+
+</main>
+
+
+</body>
+
+</html>

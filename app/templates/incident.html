@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Incident #{{ incident.id }} - SOC Investigation
+    </title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+
+            background: #0b1120;
+
+            color: #e5e7eb;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+        }
+
+        /* ==================================================
+           NAVBAR
+           ================================================== */
+
+        .navbar {
+
+            background: #111827;
+
+            border-bottom:
+                1px solid #1f2937;
+
+            padding: 18px 35px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+        }
+
+        .navbar h1 {
+
+            margin: 0;
+
+            font-size: 20px;
+
+            color: #60a5fa;
+        }
+
+        .navbar a {
+
+            color: #d1d5db;
+
+            text-decoration: none;
+
+            margin-left: 20px;
+
+            font-size: 14px;
+        }
+
+        .navbar a:hover {
+
+            color: #60a5fa;
+        }
+
+        /* ==================================================
+           MAIN CONTAINER
+           ================================================== */
+
+        .container {
+
+            width: 92%;
+
+            max-width: 1250px;
+
+            margin: 30px auto;
+        }
+
+        /* ==================================================
+           PAGE HEADER
+           ================================================== */
+
+        .page-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            flex-wrap: wrap;
+
+            gap: 15px;
+
+            margin-bottom: 25px;
+        }
+
+        .page-header h2 {
+
+            margin: 0;
+
+            font-size: 26px;
+
+            color: #f9fafb;
+        }
+
+        .page-header p {
+
+            margin-top: 7px;
+
+            color: #9ca3af;
+
+            font-size: 14px;
+        }
+
+        /* ==================================================
+           BUTTONS
+           ================================================== */
+
+        .button {
+
+            display: inline-block;
+
+            padding: 11px 18px;
+
+            border-radius: 6px;
+
+            text-decoration: none;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            margin-left: 8px;
+        }
+
+        .button-dashboard {
+
+            background: #374151;
+
+            color: #ffffff;
+        }
+
+        .button-dashboard:hover {
+
+            background: #4b5563;
+        }
+
+        .button-pdf {
+
+            background: #2563eb;
+
+            color: #ffffff;
+        }
+
+        .button-pdf:hover {
+
+            background: #1d4ed8;
+        }
+
+        .button-ioc {
+            background: #059669;
+            color: #ffffff;
+        }
+
+            .button-ioc:hover {
+            background: #047857;
+    }
+
+
+
+
+        /* ==================================================
+           STATUS BANNER
+           ================================================== */
+
+        .status-banner {
+
+            background: #111827;
+
+            border: 1px solid #1f2937;
+
+            border-radius: 10px;
+
+            padding: 22px;
+
+            margin-bottom: 25px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            flex-wrap: wrap;
+
+            gap: 20px;
+        }
+
+        .status-label {
+
+            color: #9ca3af;
+
+            font-size: 12px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1px;
+
+            margin-bottom: 6px;
+        }
+
+        .verdict {
+
+            font-size: 25px;
+
+            font-weight: bold;
+        }
+
+        .score {
+
+            font-size: 32px;
+
+            font-weight: bold;
+
+            color: #60a5fa;
+        }
+
+        /* ==================================================
+           VERDICT COLORS
+           ================================================== */
+
+        .malicious {
+
+            color: #ef4444;
+        }
+
+        .suspicious {
+
+            color: #f59e0b;
+        }
+
+        .benign {
+
+            color: #22c55e;
+        }
+
+        /* ==================================================
+           GRID
+           ================================================== */
+
+        .grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(300px, 1fr)
+                );
+
+            gap: 20px;
+
+            margin-bottom: 20px;
+        }
+
+        /* ==================================================
+           CARD
+           ================================================== */
+
+        .card {
+
+            background: #111827;
+
+            border:
+                1px solid #1f2937;
+
+            border-radius: 10px;
+
+            padding: 22px;
+        }
+
+        .card h3 {
+
+            margin-top: 0;
+
+            margin-bottom: 18px;
+
+            font-size: 17px;
+
+            color: #60a5fa;
+        }
+
+        /* ==================================================
+           INFORMATION ROW
+           ================================================== */
+
+        .info-row {
+
+            display: grid;
+
+            grid-template-columns:
+                130px 1fr;
+
+            gap: 15px;
+
+            padding: 9px 0;
+
+            border-bottom:
+                1px solid #1f2937;
+
+            font-size: 14px;
+        }
+
+        .info-row:last-child {
+
+            border-bottom: none;
+        }
+
+        .info-label {
+
+            color: #9ca3af;
+
+            font-weight: bold;
+        }
+
+        .info-value {
+
+            color: #e5e7eb;
+
+            word-break: break-word;
+        }
+
+        /* ==================================================
+           IOC SECTION
+           ================================================== */
+
+        .ioc-box {
+
+            background: #0b1120;
+
+            border:
+                1px solid #1f2937;
+
+            border-radius: 6px;
+
+            padding: 12px;
+
+            margin-bottom: 10px;
+
+            font-family:
+                Consolas,
+                monospace;
+
+            font-size: 13px;
+
+            white-space: pre-wrap;
+
+            word-break: break-word;
+
+            color: #d1d5db;
+        }
+
+        .ioc-title {
+
+            font-size: 13px;
+
+            color: #9ca3af;
+
+            margin-bottom: 7px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.5px;
+        }
+
+        /* ==================================================
+           ACTION BOX
+           ================================================== */
+
+        .action-box {
+
+            background: #0f172a;
+
+            border:
+                1px solid #334155;
+
+            border-left:
+                4px solid #3b82f6;
+
+            border-radius: 6px;
+
+            padding: 18px;
+
+            line-height: 1.6;
+
+            color: #dbeafe;
+        }
+
+        /* ==================================================
+           METADATA
+           ================================================== */
+
+        .metadata {
+
+            color: #6b7280;
+
+            font-size: 12px;
+
+            margin-top: 25px;
+
+            text-align: center;
+        }
+
+        /* ==================================================
+           RESPONSIVE
+           ================================================== */
+
+        @media (max-width: 700px) {
+
+            .navbar {
+
+                padding: 15px 20px;
+
+                flex-direction: column;
+
+                align-items: flex-start;
+            }
+
+            .navbar a {
+
+                margin-left: 0;
+
+                margin-right: 15px;
+            }
+
+            .container {
+
+                width: 94%;
+            }
+
+            .info-row {
+
+                grid-template-columns: 1fr;
+                gap: 5px;
+            }
+
+            .page-header {
+
+                align-items: flex-start;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ======================================================
+     NAVIGATION BAR
+     ====================================================== -->
+
+<div class="navbar">
+
+    <h1>
+        SOC Investigation Console
+    </h1>
+
+    <div>
+
+        <a href="/">
+            Analyze Email
+        </a>
+
+        <a href="/dashboard">
+            Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- ======================================================
+     MAIN CONTAINER
+     ====================================================== -->
+
+<div class="container">
+
+
+    <!-- ==================================================
+         PAGE HEADER
+         ================================================== -->
+
+    <div class="page-header">
+
+        <div>
+
+            <h2>
+                Incident #{{ incident.id }}
+            </h2>
+
+            <p>
+                Security incident investigation and analysis
+            </p>
+
+        </div>
+
+
+        <div>
+
+            <a
+                href="/dashboard"
+                class="button button-dashboard"
+            >
+                ← Dashboard
+            </a>
+
+            <a
+                href="/incident/{{ incident.id }}/report"
+                class="button button-pdf"
+            >
+                Generate PDF Report
+            </a>
+
+            <a
+                href="/incident/{{ incident.id }}/export-iocs"
+                class="button button-ioc"
+            >
+                Export IOCs
+            </a>
+
+
+
+        </div>
+
+    </div>
+
+
+    <!-- ==================================================
+         STATUS BANNER
+         ================================================== -->
+
+    <div class="status-banner">
+
+        <div>
+
+            <div class="status-label">
+                Verdict
+            </div>
+
+            {% if incident.verdict == "MALICIOUS" %}
+
+                <div class="verdict malicious">
+                    MALICIOUS
+                </div>
+
+            {% elif incident.verdict == "SUSPICIOUS" %}
+
+                <div class="verdict suspicious">
+                    SUSPICIOUS
+                </div>
+
+            {% else %}
+
+                <div class="verdict benign">
+                    BENIGN
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <div>
+
+            <div class="status-label">
+                Risk Score
+            </div>
+
+            <div class="score">
+
+                {{ incident.risk_score }}/100
+
+            </div>
+
+        </div>
+
+
+        <div>
+
+            <div class="status-label">
+                Risk Level
+            </div>
+
+            <strong>
+                {{ incident.risk_level }}
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            <div class="status-label">
+                Priority
+            </div>
+
+            <strong>
+                {{ incident.priority }}
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            <div class="status-label">
+                Confidence
+            </div>
+
+            <strong>
+                {{ incident.confidence }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==================================================
+         INCIDENT INFORMATION
+         ================================================== -->
+
+    <div class="grid">
+
+
+        <!-- INCIDENT DETAILS -->
+
+        <div class="card">
+
+            <h3>
+                Incident Details
+            </h3>
+
+            <div class="info-row">
+
+                <div class="info-label">
+                    Incident ID
+                </div>
+
+                <div class="info-value">
+                    #{{ incident.id }}
+                </div>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <div class="info-label">
+                    File Name
+                </div>
+
+                <div class="info-value">
+                    {{ incident.filename }}
+                </div>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <div class="info-label">
+                    Analysis Time
+                </div>
+
+                <div class="info-value">
+                    {{ incident.analysis_time }}
+                </div>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <div class="info-label">
+                    Verdict
+                </div>
+
+                <div class="info-value">
+                    {{ incident.verdict }}
+                </div>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <div class="info-label">
+                    Risk Level
+                </div>
+
+                <div class="info-value">
+                    {{ incident.risk_level }}
+                </div>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <div class="info-label">
+                    Priority
+                </div>
+
+                <div class="info-value">
+                    {{ incident.priority }}
+                </div>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <div class="info-label">
+                    Confidence
+                </div>
+
+                <div class="info-value">
+                    {{ incident.confidence }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- EMAIL DETAILS -->
+
+        <div class="card">
+
+            <h3>
+                Email Information
+            </h3>
+
+            <div class="info-row">
+
+                <div class="info-label">
+                    Sender
+                </div>
+
+                <div class="info-value">
+                    {{ incident.sender or "N/A" }}
+                </div>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <div class="info-label">
+                    Recipient
+                </div>
+
+                <div class="info-value">
+                    {{ incident.recipient or "N/A" }}
+                </div>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <div class="info-label">
+                    Subject
+                </div>
+
+                <div class="info-value">
+                    {{ incident.subject or "N/A" }}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==================================================
+         IOC INFORMATION
+         ================================================== -->
+
+    <div class="card">
+
+        <h3>
+            Indicators of Compromise (IOCs)
+        </h3>
+
+
+        <!-- URL IOC -->
+
+        <div class="ioc-title">
+            URL IOCs
+        </div>
+
+        <div class="ioc-box">
+
+            {% if incident.urls %}
+
+                {{ incident.urls }}
+
+            {% else %}
+
+                No URL indicators detected.
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- IP IOC -->
+
+        <div class="ioc-title">
+            IP Address IOCs
+        </div>
+
+        <div class="ioc-box">
+
+            {% if incident.ips %}
+
+                {{ incident.ips }}
+
+            {% else %}
+
+                No IP indicators detected.
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- DOMAIN IOC -->
+
+        <div class="ioc-title">
+            Domain IOCs
+        </div>
+
+        <div class="ioc-box">
+
+            {% if incident.domains %}
+
+                {{ incident.domains }}
+
+            {% else %}
+
+                No domain indicators detected.
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- ==================================================
+         SOC RECOMMENDED ACTION
+         ================================================== -->
+
+    <div class="card">
+
+        <h3>
+            Recommended SOC Action
+        </h3>
+
+        <div class="action-box">
+
+            {{ incident.recommended_action }}
+
+        </div>
+
+    </div>
+
+
+    <!-- ==================================================
+         DATABASE METADATA
+         ================================================== -->
+
+    <div class="card">
+
+        <h3>
+            Investigation Metadata
+        </h3>
+
+        <div class="info-row">
+
+            <div class="info-label">
+                Database ID
+            </div>
+
+            <div class="info-value">
+                {{ incident.id }}
+            </div>
+
+        </div>
+
+
+        <div class="info-row">
+
+            <div class="info-label">
+                Stored Record
+            </div>
+
+            <div class="info-value">
+                SQLite phishing_triage.db
+            </div>
+
+        </div>
+
+
+        <div class="info-row">
+
+            <div class="info-label">
+                Analysis Pipeline
+            </div>
+
+            <div class="info-value">
+                Email Parser → IOC Extraction →
+                Header Analysis → URL Analysis →
+                VirusTotal → Risk Engine → Triage
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==================================================
+         FOOTER
+         ================================================== -->
+
+    <div class="metadata">
+
+        Automated Threat Intelligence &amp;
+        Phishing Triage Pipeline
+
+        <br><br>
+
+        SOC Incident Investigation Console
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

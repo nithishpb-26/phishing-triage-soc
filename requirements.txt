@@ -1,0 +1,7 @@
+Flask
+python-dotenv
+requests
+beautifulsoup4
+dnspython
+tldextract
+fpdf2

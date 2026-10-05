@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <title>
+        Phishing Analysis Report
+    </title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 30px;
+            color: #222;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        h1 {
+            margin-bottom: 5px;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .stat {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .stat h3 {
+            margin-top: 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .stat p {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 0;
+        }
+
+        .score {
+            font-size: 48px;
+            font-weight: bold;
+        }
+
+        .progress {
+            width: 100%;
+            height: 20px;
+            background: #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #333;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            background: #eee;
+        }
+
+        .critical {
+            background: #8b0000;
+            color: white;
+        }
+
+        .high {
+            background: #d9534f;
+            color: white;
+        }
+
+        .medium {
+            background: #f0ad4e;
+            color: white;
+        }
+
+        .low {
+            background: #5cb85c;
+            color: white;
+        }
+
+        .minimal {
+            background: #5cb85c;
+            color: white;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background: #f1f1f1;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background: #f7f7f7;
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        .action-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-left: 5px solid #333;
+            margin-top: 15px;
+        }
+
+        .reason {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .reason:last-child {
+            border-bottom: none;
+        }
+
+        .points {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 10px 18px;
+            background: #333;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <a href="/" class="back-button">
+        ← Analyze Another Email
+    </a>
+
+
+    <!-- ===================================== -->
+    <!-- TITLE -->
+    <!-- ===================================== -->
+
+    <div class="card">
+
+        <h1>
+            Automated Threat Intelligence
+            & Phishing Triage
+        </h1>
+
+        <p>
+            Email Security Analysis Report
+        </p>
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- RISK ASSESSMENT -->
+    <!-- ===================================== -->
+
+    <div class="card">
+
+        <h2>
+            Automated Risk Assessment
+        </h2>
+
+        <div class="grid">
+
+            <div class="stat">
+
+                <h3>
+                    Risk Score
+                </h3>
+
+                <div class="score">
+                    {{ risk_result.score }}/100
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <h3>
+                    Verdict
+                </h3>
+
+                <p>
+
+                    <span class="badge
+                    {% if risk_result.verdict == 'MALICIOUS' %}
+                        high
+                    {% elif risk_result.verdict == 'SUSPICIOUS' %}
+                        medium
+                    {% else %}
+                        low
+                    {% endif %}
+                    ">
+
+                        {{ risk_result.verdict }}
+
+                    </span>
+
+                </p>
+
+            </div>
+
+
+            <div class="stat">
+
+                <h3>
+                    Risk Level
+                </h3>
+
+                <p>
+
+                    <span class="badge
+                    {% if risk_result.risk_level == 'HIGH' %}
+                        high
+                    {% elif risk_result.risk_level == 'MEDIUM' %}
+                        medium
+                    {% elif risk_result.risk_level == 'LOW' %}
+                        low
+                    {% else %}
+                        minimal
+                    {% endif %}
+                    ">
+
+                        {{ risk_result.risk_level }}
+
+                    </span>
+
+                </p>
+
+            </div>
+
+
+            <div class="stat">
+
+                <h3>
+                    Indicators
+                </h3>
+
+                <p>
+                    {{
+                        iocs.urls|length
+                        + iocs.ips|length
+                        + iocs.domains|length
+                        + iocs.emails|length
+                    }}
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="progress">
+
+            <div
+                class="progress-bar"
+                style="width: {{ risk_result.score }}%;">
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- SOC TRIAGE -->
+    <!-- ===================================== -->
+
+    <div class="card">
+
+        <h2>
+            SOC Triage
+        </h2>
+
+        <div class="grid">
+
+
+            <div class="stat">
+
+                <h3>
+                    Triage Verdict
+                </h3>
+
+                <p>
+
+                    <span class="badge
+                    {% if triage_result.verdict == 'MALICIOUS' %}
+                        high
+                    {% elif triage_result.verdict == 'SUSPICIOUS' %}
+                        medium
+                    {% else %}
+                        low
+                    {% endif %}
+                    ">
+
+                        {{ triage_result.verdict }}
+
+                    </span>
+
+                </p>
+
+            </div>
+
+
+            <div class="stat">
+
+                <h3>
+                    Priority
+                </h3>
+
+                <p>
+
+                    <span class="badge
+                    {% if triage_result.priority == 'CRITICAL' %}
+                        critical
+                    {% elif triage_result.priority == 'HIGH' %}
+                        high
+                    {% elif triage_result.priority == 'MEDIUM' %}
+                        medium
+                    {% else %}
+                        low
+                    {% endif %}
+                    ">
+
+                        {{ triage_result.priority }}
+
+                    </span>
+
+                </p>
+
+            </div>
+
+
+            <div class="stat">
+
+                <h3>
+                    Confidence
+                </h3>
+
+                <p>
+
+                    {{ triage_result.confidence }}
+
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="action-box">
+
+            <strong>
+                Recommended SOC Action
+            </strong>
+
+            <p>
+                {{ triage_result.action }}
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- RISK SCORE BREAKDOWN -->
+    <!-- ===================================== -->
+
+    <div class="card">
+
+        <h2>
+            Risk Score Breakdown
+        </h2>
+
+        {% if risk_result.reasons %}
+
+            {% for reason in risk_result.reasons %}
+
+                <div class="reason">
+
+                    <span class="points">
+
+                        +{{ reason.points }}
+
+                    </span>
+
+                    {{ reason.reason }}
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p>
+                No significant risk indicators detected.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- FILE INFORMATION -->
+    <!-- ===================================== -->
+
+    <div class="card">
+
+        <h2>
+            File Information
+        </h2>
+
+        <p>
+            <strong>Filename:</strong>
+            {{ filename }}
+        </p>
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- EMAIL INFORMATION -->
+    <!-- ===================================== -->
+
+    <div class="card">
+
+        <h2>
+            Email Information
+        </h2>
+
+        <div class="table-container">
+
+            <table>
+
+                <tr>
+                    <th>Sender</th>
+                    <td>{{ email.sender }}</td>
+                </tr>
+
+                <tr>
+                    <th>Recipient</th>
+                    <td>{{ email.recipient }}</td>
+                </tr>
+
+                <tr>
+                    <th>Subject</th>
+                    <td>{{ email.subject }}</td>
+                </tr>
+
+                <tr>
+                    <th>Date</th>
+                    <td>{{ email.date }}</td>
+                </tr>
+
+                <tr>
+                    <th>Reply-To</th>
+                    <td>{{ email.reply_to }}</td>
+                </tr>
+
+                <tr>
+                    <th>Message-ID</th>
+                    <td>{{ email.message_id }}</td>
+                </tr>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- HEADER ANALYSIS -->
+    <!-- ===================================== -->
+
+    <div class="card">
+
+        <h2>
+            Email Header Analysis
+        </h2>
+
+        <div class="table-container">
+
+            <table>
+
+                <tr>
+                    <th>Header</th>
+                    <th>Status</th>
+                    <th>Analysis</th>
+                </tr>
+
+                {% for name, finding in header_findings.items() %}
+
+                <tr>
+
+                    <td>
+                        {{ name }}
+                    </td>
+
+                    <td>
+                        <strong>
+                            {{ finding.status }}
+                        </strong>
+                    </td>
+
+                    <td>
+                        {{ finding.message }}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- IOC ANALYSIS -->
+    <!-- ===================================== -->
+
+    <div class="card">
+
+        <h2>
+            IOC Analysis
+        </h2>
+
+        <div class="grid">
+
+            <div class="stat">
+
+                <h3>
+                    URLs
+                </h3>
+
+                <p>
+                    {{ iocs.urls|length }}
+                </p>
+
+            </div>
+
+            <div class="stat">
+
+                <h3>
+                    IP Addresses
+                </h3>
+
+                <p>
+                    {{ iocs.ips|length }}
+                </p>
+
+            </div>
+
+            <div class="stat">
+
+                <h3>
+                    Domains
+                </h3>
+
+                <p>
+                    {{ iocs.domains|length }}
+                </p>
+
+            </div>
+
+            <div class="stat">
+
+                <h3>
+                    Email Addresses
+                </h3>
+
+                <p>
+                    {{ iocs.emails|length }}
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- URL ANALYSIS -->
+    <!-- ===================================== -->
+
+    <div class="card">
+
+        <h2>
+            URL Analysis
+        </h2>
+
+        {% if url_findings %}
+
+        <div class="table-container">
+
+            <table>
+
+                <tr>
+
+                    <th>URL</th>
+                    <th>Category</th>
+                    <th>Risk</th>
+                    <th>Reason</th>
+
+                </tr>
+
+                {% for result in url_findings %}
+
+                <tr>
+
+                    <td>
+                        {{ result.url }}
+                    </td>
+
+                    <td>
+                        {{ result.category }}
+                    </td>
+
+                    <td>
+                        {{ result.risk }}
+                    </td>
+
+                    <td>
+                        {{ result.reason }}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <p>
+            No URLs were extracted.
+        </p>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- VIRUSTOTAL -->
+    <!-- ===================================== -->
+
+    <div class="card">
+
+        <h2>
+            VirusTotal Intelligence
+        </h2>
+
+
+        <h3>
+            URLs
+        </h3>
+
+        {% if virustotal_findings.urls %}
+
+        <div class="table-container">
+
+            <table>
+
+                <tr>
+                    <th>Indicator</th>
+                    <th>Status</th>
+                    <th>Malicious</th>
+                    <th>Suspicious</th>
+                    <th>Undetected</th>
+                    <th>Harmless</th>
+                </tr>
+
+                {% for result in virustotal_findings.urls %}
+
+                <tr>
+
+                    <td>
+                        {{ result.indicator }}
+                    </td>
+
+                    <td>
+                        {{ result.status }}
+                    </td>
+
+                    <td>
+                        {{ result.stats.malicious
+                           if result.stats is defined else 0 }}
+                    </td>
+
+                    <td>
+                        {{ result.stats.suspicious
+                           if result.stats is defined else 0 }}
+                    </td>
+
+                    <td>
+                        {{ result.stats.undetected
+                           if result.stats is defined else 0 }}
+                    </td>
+
+                    <td>
+                        {{ result.stats.harmless
+                           if result.stats is defined else 0 }}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <p>
+            No URLs were submitted to VirusTotal.
+        </p>
+
+        {% endif %}
+
+
+        <h3>
+            IP Addresses
+        </h3>
+
+        {% if virustotal_findings.ips %}
+
+        <div class="table-container">
+
+            <table>
+
+                <tr>
+                    <th>Indicator</th>
+                    <th>Status</th>
+                    <th>Malicious</th>
+                    <th>Suspicious</th>
+                    <th>Undetected</th>
+                    <th>Harmless</th>
+                </tr>
+
+                {% for result in virustotal_findings.ips %}
+
+                <tr>
+
+                    <td>
+                        {{ result.indicator }}
+                    </td>
+
+                    <td>
+                        {{ result.status }}
+                    </td>
+
+                    <td>
+                        {{ result.stats.malicious
+                           if result.stats is defined else 0 }}
+                    </td>
+
+                    <td>
+                        {{ result.stats.suspicious
+                           if result.stats is defined else 0 }}
+                    </td>
+
+                    <td>
+                        {{ result.stats.undetected
+                           if result.stats is defined else 0 }}
+                    </td>
+
+                    <td>
+                        {{ result.stats.harmless
+                           if result.stats is defined else 0 }}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <p>
+            No IP addresses were submitted to VirusTotal.
+        </p>
+
+        {% endif %}
+
+
+        <h3>
+            Domains
+        </h3>
+
+        {% if virustotal_findings.domains %}
+
+        <div class="table-container">
+
+            <table>
+
+                <tr>
+                    <th>Indicator</th>
+                    <th>Status</th>
+                    <th>Malicious</th>
+                    <th>Suspicious</th>
+                    <th>Undetected</th>
+                    <th>Harmless</th>
+                </tr>
+
+                {% for result in virustotal_findings.domains %}
+
+                <tr>
+
+                    <td>
+                        {{ result.indicator }}
+                    </td>
+
+                    <td>
+                        {{ result.status }}
+                    </td>
+
+                    <td>
+                        {{ result.stats.malicious
+                           if result.stats is defined else 0 }}
+                    </td>
+
+                    <td>
+                        {{ result.stats.suspicious
+                           if result.stats is defined else 0 }}
+                    </td>
+
+                    <td>
+                        {{ result.stats.undetected
+                           if result.stats is defined else 0 }}
+                    </td>
+
+                    <td>
+                        {{ result.stats.harmless
+                           if result.stats is defined else 0 }}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <p>
+            No domains were submitted to VirusTotal.
+        </p>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- ATTACHMENTS -->
+    <!-- ===================================== -->
+
+    <div class="card">
+
+        <h2>
+            Attachment Analysis
+        </h2>
+
+        {% if attachment_findings %}
+
+        <div class="table-container">
+
+            <table>
+
+                <tr>
+
+                    <th>Filename</th>
+                    <th>Type</th>
+                    <th>Size</th>
+                    <th>Extension</th>
+                    <th>Risk</th>
+                    <th>Reason</th>
+
+                </tr>
+
+                {% for attachment in attachment_findings %}
+
+                <tr>
+
+                    <td>
+                        {{ attachment.filename }}
+                    </td>
+
+                    <td>
+                        {{ attachment.content_type }}
+                    </td>
+
+                    <td>
+                        {{ attachment.size }} bytes
+                    </td>
+
+                    <td>
+                        {{ attachment.extension }}
+                    </td>
+
+                    <td>
+                        {{ attachment.risk }}
+                    </td>
+
+                    <td>
+                        {{ attachment.reason }}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <p>
+            No attachments detected.
+        </p>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- EMAIL BODY -->
+    <!-- ===================================== -->
+
+    <div class="card">
+
+        <h2>
+            Email Body
+        </h2>
+
+        <pre>{{ email.body }}</pre>
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- RAW SECURITY HEADERS -->
+    <!-- ===================================== -->
+
+    <div class="card">
+
+        <h2>
+            Raw Security Headers
+        </h2>
+
+        <p>
+            <strong>Received-SPF:</strong>
+            {{ email.received_spf }}
+        </p>
+
+        <p>
+            <strong>DKIM-Signature:</strong>
+        </p>
+
+        <pre>{{ email.dkim_signature }}</pre>
+
+        <p>
+            <strong>Authentication-Results:</strong>
+        </p>
+
+        <pre>{{ email.authentication_results }}</pre>
+
+    </div>
+
+
+</div>
+
+</body>
+
+</html>
